@@ -1,4 +1,4 @@
-# Design Document for "Dungeon Master AI"
+# Design Document for "Dungeon Master AI" (DMGPT)
 
 ## Introduction
 
