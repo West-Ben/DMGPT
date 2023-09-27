@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [ "docker-react-flask" ]
+  pull_request:
+    branches: [ "dev" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Docker Compose
+        run: |
+          choco install docker-desktop
+          Restart-Computer -Force -Confirm:$false
+
+      - name: Start Docker Desktop
+        run: |
+          Start-Process -FilePath "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+          docker info
+
+      - name: Load Docker Compose File and Spin Up Containers
+        run: |
+          cd  C:/projects/DMGPT
+          docker-compose up -d
+
+      - name: List Running Containers
+        run: |
+          docker ps
+
+      - name: Check http://localhost:3000/
+        run: |
+          $retryCount = 0
+          $maxRetries = 5
+          $url = "http://localhost:3000/"
+      
+          do {
+            try {
+              $response = Invoke-WebRequest -Uri $url -UseBasicParsing
+              if ($response.StatusCode -eq 200) {
+                Write-Host "Successfully reached $url"
+                break
+              } else {
+                Write-Host "Received status code $($response.StatusCode) from $url"
+              }
+            } catch {
+              Write-Host "Failed to reach $url. Retrying in 10 seconds..."
+              Start-Sleep -Seconds 10
+              $retryCount++
+            }
+          } while ($retryCount -lt $maxRetries)
+      
+          if ($retryCount -eq $maxRetries) {
+            throw "Failed to reach $url after $maxRetries retries."
+          }
