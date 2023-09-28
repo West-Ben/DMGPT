@@ -13,15 +13,17 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-      
-
     - name: Checkout Repository
       uses: actions/checkout@v3
       with:
         ref: 'docker-flask-react'
+        
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag image:$(date +%s)
+      
+
+    
           
     - name: Load Docker Compose File and Spin Up Containers
       run: |
