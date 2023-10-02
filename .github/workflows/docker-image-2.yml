@@ -19,7 +19,7 @@ jobs:
       
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
-
+      
     - name: Cache Docker layers
       uses: actions/cache@v2
       with:
@@ -28,11 +28,20 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-
           
-    - name: Build and push Docker image
+    - name: Build Flask Docker image
       uses: docker/build-push-action@v2
       with:
-        context: .
-        file: ./Dockerfile
+        context: ./backend
+        file: ./backend/Dockerfile.flask
+        push: false
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
+
+    - name: Build React Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: ./frontend
+        file: ./frontend/Dockerfile.react
         push: false
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
