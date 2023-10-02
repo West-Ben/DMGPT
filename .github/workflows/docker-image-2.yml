@@ -1,60 +1,50 @@
-name: Docker Image CI
-
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
-
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest # Changed to a Linux runner since it's more common and well-supported for Docker
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
       with:
         ref: 'docker-flask-react'
-        
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag image:$(date +%s)
-    
-    
-          
-    - name: Load Docker Compose File and Spin Up Containers
-      run: |
-        cd  C:/projects/DMGPT
-        docker-compose up -d
-        
-    - name: List Running Containers
-      run: |
-        docker ps
-        
-    - name: Check http://localhost:3000/
-      run: |
-        $retryCount = 0
-        $maxRetries = 5
-        $url = "http://localhost:3000/"
-        
-        do {
-          try {
-            $response = Invoke-WebRequest -Uri $url -UseBasicParsing
-            if ($response.StatusCode -eq 200) {
-              Write-Host "Successfully reached $url"
-              break
-            } else {
-              Write-Host "Received status code $($response.StatusCode) from $url"
-            }
-          } catch {
-            Write-Host "Failed to reach $url. Retrying in 10 seconds..."
-            Start-Sleep -Seconds 10
-            $retryCount++
-          }
-        } while ($retryCount -lt $maxRetries)
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
 
-        if ($retryCount -eq $maxRetries) {
-          throw "Failed to reach $url after $maxRetries retries."
-        }
+    - name: Cache Docker layers
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+          
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Dockerfile
+        push: false
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
+
+    - name: Set up Docker Compose
+      run: |
+        docker-compose up -d
+
+    - name: Wait for application to be ready
+      run: |
+        sleep 60 # Waiting for application to start. Consider using a more robust way to wait for your specific application.
+
+    - name: Check application
+      run: |
+        curl http://localhost:3000 || exit 1
