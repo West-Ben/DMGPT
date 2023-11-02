@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from typing import List
-from ..models.item import Item
-from ..schemas.item import ItemCreate, ItemOut
+from models.item import Item
+from schemas.item import ItemCreate, ItemOut
 
 router = APIRouter()
 
