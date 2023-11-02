@@ -1,6 +1,5 @@
 {
     "name": "Python FastAPI and React",
-    "dockerComposeFile": "docker-compose.yml",
     "service": "app",
     "workspaceFolder": "/workspace",
     "extensions": [
@@ -24,10 +23,6 @@
     "shutdownAction": "stopCompose",
     "services": {
         "app": {
-            "build": {
-                "context": ".",
-                "dockerfile": "Dockerfile"
-            },
             "command": "uvicorn main:app --host 0.0.0.0 --port 8000 --reload",
             "ports": [
                 "8000:8000"
