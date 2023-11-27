@@ -13,3 +13,40 @@ https://github.com/openai/whisper
 https://elevenlabs.io/
 
 ### image generator
+
+
+## Project Structure
+
+The project has the following file structure:
+
+```
+my-fastapi-react-app/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── models/
+│   │   │   └── __init__.py
+│   │   ├── routes/
+│   │   │   ├── __init__.py
+│   │   │   └── items.py
+│   │   └── schemas/
+│   │       └── __init__.py
+│   ├── requirements.txt
+│   └── README.md
+├── frontend/
+│   ├── public/
+│   │   ├── index.html
+│   │   └── favicon.ico
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── index.js
+│   │   ├── components/
+│   │   │   └── ItemList.js
+│   │   └── utils/
+│   │       └── api.js
+│   ├── package.json
+│   ├── package-lock.json
+│   └── README.md
+└── README.md
+```
